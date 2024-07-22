@@ -62,11 +62,9 @@ export class LangflowClient {
     if (response && response.outputs && response.outputs.length > 0) {
       const output = response.outputs[0];
       if (output && output.outputs && output.outputs.length > 0) {
-        const message = output.outputs[0].message;
-        if (message && typeof message === 'string') {
-          return message;
-        } else if (message && message.content) {
-          return message.content;
+        const textOutput = output.outputs[0].outputs.text;
+        if (textOutput && textOutput.message) {
+          return textOutput.message;
         }
       }
     }
