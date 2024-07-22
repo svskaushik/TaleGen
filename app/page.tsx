@@ -9,6 +9,21 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        await langflowClient.ping();
+        setConnectionStatus("connected");
+      } catch (error) {
+        setConnectionStatus("disconnected");
+        console.error("Failed to connect to Langflow server:", error);
+      }
+    };
+
+    checkConnection();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +59,13 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
         <h1 className="text-4xl font-bold mb-8">Chat with Langflow</h1>
+        <div className={`text-sm mb-4 ${
+          connectionStatus === "connected" ? "text-green-500" :
+          connectionStatus === "disconnected" ? "text-red-500" :
+          "text-yellow-500"
+        }`}>
+          Status: {connectionStatus}
+        </div>
         <div className="border rounded-lg p-4 h-[60vh] overflow-y-auto mb-4">
           {messages.map((message, index) => (
             <div key={index} className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}>

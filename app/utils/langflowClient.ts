@@ -7,6 +7,14 @@ export class LangflowClient {
     this.apiKey = apiKey;
   }
 
+  async ping() {
+    const response = await fetch(`${this.baseURL}/api/v1/health`);
+    if (!response.ok) {
+      throw new Error('Langflow server is not responding');
+    }
+    return await response.json();
+  }
+
   async post(endpoint: string, body: any, headers: Record<string, string> = {"Content-Type": "application/json"}) {
     if (this.apiKey) {
       headers["Authorization"] = `Bearer ${this.apiKey}`;
