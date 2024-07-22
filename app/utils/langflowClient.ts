@@ -19,12 +19,17 @@ export class LangflowClient {
         body: JSON.stringify(body)
       });
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const errorBody = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorBody}`);
       }
       return await response.json();
     } catch (error) {
       console.error('Request Error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(`Failed to connect to Langflow server: ${error.message}`);
+      } else {
+        throw new Error('An unknown error occurred');
+      }
     }
   }
 

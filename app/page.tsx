@@ -16,37 +16,24 @@ export default function Home() {
 
     setIsLoading(true);
     setMessages((prev) => [...prev, { role: "user", content: input }]);
+    const currentInput = input;
     setInput("");
 
     try {
       const response = await langflowClient.runFlow(
         "8958bfbf-d3a3-4c4a-adbf-d35d831c4265",
-        input
+        currentInput
       );
       setMessages((prev) => [...prev, { role: "assistant", content: response }]);
     } catch (error) {
       console.error("Error:", error);
+      let errorMessage = "Sorry, there was an error processing your request.";
+      if (error instanceof Error) {
+        errorMessage += " " + error.message;
+      }
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, there was an error processing your request." },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-    setMessages((prev) => [...prev, { role: "user", content: input }]);
-    setInput("");
-
-    try {
-      const response = await langflowClient.runFlow(
-        "8958bfbf-d3a3-4c4a-adbf-d35d831c4265",
-        input
-      );
-      setMessages((prev) => [...prev, { role: "assistant", content: response }]);
-    } catch (error) {
-      console.error("Error:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, there was an error processing your request." },
+        { role: "assistant", content: errorMessage },
       ]);
     } finally {
       setIsLoading(false);
