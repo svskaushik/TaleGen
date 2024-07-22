@@ -59,14 +59,10 @@ export class LangflowClient {
     };
     const response = await this.post(endpoint, body);
     console.log('Response:', response.outputs[0].outputs[0].artifacts.text.repr);
-    if (response && response.outputs && response.outputs.length > 0) {
-      const output = response.outputs[0];
-      if (output && output.outputs && output.outputs.length > 0) {
-        const textOutput = output.outputs[0].outputs.text;
-        if (textOutput && textOutput.message) {
-          return textOutput.message;
-        }
-      }
+    if (response && response.outputs && response.outputs.length > 0 &&
+        response.outputs[0].outputs && response.outputs[0].outputs.length > 0 &&
+        response.outputs[0].outputs[0].artifacts && response.outputs[0].outputs[0].artifacts.text) {
+      return response.outputs[0].outputs[0].artifacts.text.repr;
     }
     throw new Error('Unexpected response format from Langflow server');
   }
