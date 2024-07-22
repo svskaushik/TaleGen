@@ -58,6 +58,7 @@ export class LangflowClient {
       }
     };
     const response = await this.post(endpoint, body);
+    console.log('Response:', response);
     if (response && response.outputs && response.outputs.length > 0) {
       const output = response.outputs[0];
       if (output && output.outputs && output.outputs.length > 0) {
