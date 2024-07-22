@@ -5,6 +5,13 @@ import { LangflowClient } from "./utils/langflowClient";
 
 const langflowClient = new LangflowClient("http://127.0.0.1:7860");
 
+"use client";
+
+import { useState } from "react";
+import { LangflowClient } from "./utils/langflowClient";
+
+const langflowClient = new LangflowClient("http://127.0.0.1:7860");
+
 export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
