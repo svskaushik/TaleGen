@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 
 const langflowClient = new LangflowClient("http://127.0.0.1:7865");
@@ -10,6 +10,15 @@ export default function Home() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -75,6 +84,7 @@ export default function Home() {
             </div>
           ))}
           {isLoading && <div className="text-center">Loading...</div>}
+          <div ref={messagesEndRef} />
         </div>
         <form onSubmit={handleSubmit} className="flex">
           <input
