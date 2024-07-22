@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 
-const langflowClient = new LangflowClient("http://127.0.0.1:7860");
+const langflowClient = new LangflowClient("http://127.0.0.1:7865");
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -36,7 +36,7 @@ export default function Home() {
 
     try {
       const response = await langflowClient.runFlow(
-        "8958bfbf-d3a3-4c4a-adbf-d35d831c4265",
+        "e73e4a69-bd5e-42ed-b701-5f941e59dbc1",
         currentInput
       );
       setMessages((prev) => [...prev, { role: "assistant", content: response }]);
