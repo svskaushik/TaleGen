@@ -58,6 +58,17 @@ export class LangflowClient {
       }
     };
     const response = await this.post(endpoint, body);
-    return response.outputs[0].outputs[0].outputs.message.message.text;
+    if (response && response.outputs && response.outputs.length > 0) {
+      const output = response.outputs[0];
+      if (output && output.outputs && output.outputs.length > 0) {
+        const message = output.outputs[0].message;
+        if (message && typeof message === 'string') {
+          return message;
+        } else if (message && message.content) {
+          return message.content;
+        }
+      }
+    }
+    throw new Error('Unexpected response format from Langflow server');
   }
 }
