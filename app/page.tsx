@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 
-const langflowClient = new LangflowClient("http://127.0.0.1:7865");
+const langflowClient = new LangflowClient("http://127.0.0.1:7866");
 
 export default function Home() {
   const [input, setInput] = useState("");
