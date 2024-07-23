@@ -71,7 +71,17 @@ export default function Home() {
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
         <div className="p-4">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Menu</h2>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Menu</h2>
+          </div>
           {/* Add menu items here */}
         </div>
       </div>
