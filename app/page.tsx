@@ -11,6 +11,7 @@ export default function Home() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -66,64 +67,90 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-4 sm:p-6 bg-gray-100 dark:bg-gray-900">
-      <div className="z-10 w-full max-w-3xl flex flex-col items-center justify-between font-sans text-sm">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">Chat with Langflow</h1>
-        <div className={`text-sm mb-4 ${
-          connectionStatus === "connected" ? "text-green-500" :
-          connectionStatus === "disconnected" ? "text-red-500" :
-          "text-yellow-500"
-        }`}>
-          Status: {connectionStatus}
+    <main className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
+        <div className="p-4">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Menu</h2>
+          {/* Add menu items here */}
         </div>
-        <div className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-4 h-[60vh] overflow-y-auto mb-4 bg-white dark:bg-gray-800 shadow-md">
-          <AnimatePresence>
-            {messages.map((message, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
-              >
-                <span className={`inline-block p-2 rounded-lg ${
-                  message.role === "user" 
-                    ? "bg-blue-500 text-white" 
-                    : "bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
-                }`}>
-                  {message.content}
-                </span>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center text-gray-500 dark:text-gray-400"
-            >
-              Thinking...
-            </motion.div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-        <form onSubmit={handleSubmit} className="flex w-full">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-grow border border-gray-300 dark:border-gray-700 rounded-l-lg p-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            placeholder="Type your message here..."
-          />
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="bg-white dark:bg-gray-800 shadow-md p-4 flex items-center">
           <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg transition-colors duration-200"
-            disabled={isLoading}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none"
           >
-            Send
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
-        </form>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 ml-4">Chat with Langflow</h1>
+          <div className={`ml-auto text-sm ${
+            connectionStatus === "connected" ? "text-green-500" :
+            connectionStatus === "disconnected" ? "text-red-500" :
+            "text-yellow-500"
+          }`}>
+            Status: {connectionStatus}
+          </div>
+        </header>
+
+        {/* Chat area */}
+        <div className="flex-1 overflow-hidden p-4">
+          <div className="h-full flex flex-col">
+            <div className="flex-1 overflow-y-auto mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+              <AnimatePresence>
+                {messages.map((message, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
+                  >
+                    <span className={`inline-block p-2 rounded-lg ${
+                      message.role === "user" 
+                        ? "bg-blue-500 text-white" 
+                        : "bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
+                    }`}>
+                      {message.content}
+                    </span>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center text-gray-500 dark:text-gray-400"
+                >
+                  Thinking...
+                </motion.div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            <form onSubmit={handleSubmit} className="flex">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                className="flex-grow border border-gray-300 dark:border-gray-700 rounded-l-lg p-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                placeholder="Type your message here..."
+              />
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg transition-colors duration-200"
+                disabled={isLoading}
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </main>
   );
