@@ -45,8 +45,8 @@ export class LangflowClient {
     const endpoint = `/api/v1/run/${flowId}?stream=false`;
     const body = {
       input_value: inputValue,
-      output_type: "chat",
-      input_type: "chat",
+      output_type: "text",
+      input_type: "text",
       tweaks: {
         "AstraVectorStoreComponent-CoU2r": {},
         "ParseData-RCafH": {},
@@ -58,7 +58,7 @@ export class LangflowClient {
       }
     };
     const response = await this.post(endpoint, body);
-    console.log('Response:', response.outputs[0].outputs[0].artifacts.text.repr);
+    console.log('Response:', response);
     if (response && response.outputs && response.outputs.length > 0 &&
         response.outputs[0].outputs && response.outputs[0].outputs.length > 0 &&
         response.outputs[0].outputs[0].artifacts && response.outputs[0].outputs[0].artifacts.text) {

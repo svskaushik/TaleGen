@@ -47,7 +47,7 @@ export default function Home() {
 
     try {
       const response = await langflowClient.runFlow(
-        "e73e4a69-bd5e-42ed-b701-5f941e59dbc1",
+        "ddc17753-39a3-4517-acd1-cc2718cd0a83",
         currentInput
       );
       setMessages((prev) => [...prev, { role: "assistant", content: response }]);
