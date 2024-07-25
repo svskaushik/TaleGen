@@ -12,6 +12,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [illustrationsEnabled, setIllustrationsEnabled] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -82,7 +83,23 @@ export default function Home() {
             </button>
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Menu</h2>
           </div>
-          {/* Add menu items here */}
+          <div className="mt-6">
+            <label className="flex items-center cursor-pointer">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  checked={illustrationsEnabled}
+                  onChange={() => setIllustrationsEnabled(!illustrationsEnabled)}
+                />
+                <div className={`block w-14 h-8 rounded-full ${illustrationsEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}></div>
+                <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${illustrationsEnabled ? 'transform translate-x-6' : ''}`}></div>
+              </div>
+              <div className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
+                Illustrations
+              </div>
+            </label>
+          </div>
         </div>
       </div>
 
