@@ -62,7 +62,10 @@ export class LangflowClient {
     if (response && response.outputs && response.outputs.length > 0 &&
         response.outputs[0].outputs && response.outputs[0].outputs.length > 0 &&
         response.outputs[0].outputs[0].artifacts && response.outputs[0].outputs[0].artifacts.text) {
-      return response.outputs[0].outputs[0].artifacts.text.repr;
+      const text = response.outputs[0].outputs[0].artifacts.text.repr;
+      // Format the text: preserve paragraphs and line breaks
+      const formattedText = text.replace(/\n{2,}/g, '\n\n').trim();
+      return formattedText;
     }
     throw new Error('Unexpected response format from Langflow server');
   }

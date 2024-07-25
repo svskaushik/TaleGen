@@ -122,13 +122,17 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
                   >
-                    <span className={`inline-block p-2 rounded-lg ${
+                    <div className={`inline-block p-2 rounded-lg ${
                       message.role === "user" 
                         ? "bg-blue-500 text-white" 
                         : "bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
                     }`}>
-                      {message.content}
-                    </span>
+                      {message.content.split('\n').map((line, i) => (
+                        <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
