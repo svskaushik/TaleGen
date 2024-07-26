@@ -1,6 +1,7 @@
 export class LangflowClient {
   private baseURL: string;
   private apiKey?: string;
+  private imageGenURL: string = 'https://stablediffjm93xzi2jo-2a7ea2eb749f41aa.tec-s1.onthetaedgecloud.com/sdapi/v1/txt2img';
 
   constructor(baseURL: string, apiKey?: string) {
     this.baseURL = baseURL;
@@ -86,5 +87,32 @@ export class LangflowClient {
       return response.outputs[0].outputs[0].artifacts.text.repr.trim();
     }
     throw new Error('Unexpected response format from Langflow server for image prompt generation');
+  }
+
+  async generateImage(prompt: string): Promise<string> {
+    try {
+      const response = await fetch(this.imageGenURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': 'application/json'
+        },
+        body: JSON.stringify({ prompt })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.images && data.images.length > 0) {
+        return data.images[0];  // This is the base64 encoded image
+      } else {
+        throw new Error('No image generated');
+      }
+    } catch (error) {
+      console.error('Image generation error:', error);
+      throw error;
+    }
   }
 }
