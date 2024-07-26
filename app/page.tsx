@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const langflowClient = new LangflowClient("http://127.0.0.1:7866");
 
+const testPrompt = '## The Shadow of the Mountains\nThe stench of Orc-flesh and damp earth filled Frodo’s nostrils. He lay huddled in the darkness, his body aching from the rough journey and the fear that gnawed at his insides. Sam, his loyal companion, was beside him, his breathing shallow and uneven. They had been captured, their escape from the Black Riders thwarted by the sudden appearance of a band of Orcs.“Frodo?” Sam whispered, his voice barely audible. “Are you alright?'
+
 export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: string; content: string; imagePrompt?: string }[]>([]);
@@ -47,24 +49,25 @@ export default function Home() {
     setInput("");
 
     try {
-      const response = await langflowClient.runFlow(
-        "ddc17753-39a3-4517-acd1-cc2718cd0a83",
-        currentInput
-      );
+      // const response = await langflowClient.runFlow(
+      //   "ddc17753-39a3-4517-acd1-cc2718cd0a83",
+      //   currentInput
+      // );
       
       let imagePrompt = "";
       if (illustrationsEnabled) {
         try {
           imagePrompt = await langflowClient.generateImagePrompt(
-            "your-image-prompt-flow-id-here",
-            response
+            "3e321ffe-c5d3-4894-99bd-804b0f1716d7",
+            testPrompt
           );
+          console.log("Image Prompt:", imagePrompt);
         } catch (error) {
           console.error("Error generating image prompt:", error);
         }
       }
 
-      setMessages((prev) => [...prev, { role: "assistant", content: response, imagePrompt }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: testPrompt, imagePrompt }]);
     } catch (error) {
       console.error("Error:", error);
       let errorMessage = "Sorry, there was an error processing your request.";
