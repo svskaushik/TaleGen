@@ -49,17 +49,17 @@ export default function Home() {
     setInput("");
 
     try {
-      // const response = await langflowClient.runFlow(
-      //   "ddc17753-39a3-4517-acd1-cc2718cd0a83",
-      //   currentInput
-      // );
+      const response = await langflowClient.runFlow(
+        "ddc17753-39a3-4517-acd1-cc2718cd0a83",
+        currentInput
+      );
       
       let imagePrompt = "";
       if (illustrationsEnabled) {
         try {
           imagePrompt = await langflowClient.generateImagePrompt(
             "3e321ffe-c5d3-4894-99bd-804b0f1716d7",
-            testPrompt
+            response
           );
           console.log("Image Prompt:", imagePrompt);
         } catch (error) {
@@ -67,7 +67,7 @@ export default function Home() {
         }
       }
 
-      setMessages((prev) => [...prev, { role: "assistant", content: testPrompt, imagePrompt }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: response, imagePrompt }]);
     } catch (error) {
       console.error("Error:", error);
       let errorMessage = "Sorry, there was an error processing your request.";
