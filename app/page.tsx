@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
+import { generateImage } from "./utils/imageGenerationClient";
 import { motion, AnimatePresence } from "framer-motion";
 
 const langflowClient = new LangflowClient("http://127.0.0.1:7866");
@@ -10,7 +11,7 @@ const testPrompt = '## The Shadow of the Mountains\nThe stench of Orc-flesh and 
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{ role: string; content: string; imagePrompt?: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: string; content: string; imagePrompt?: string; imageUrl?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -67,7 +68,16 @@ export default function Home() {
         }
       }
 
-      setMessages((prev) => [...prev, { role: "assistant", content: response, imagePrompt }]);
+      let imageUrl = "";
+      if (illustrationsEnabled && imagePrompt) {
+        try {
+          imageUrl = await generateImage(imagePrompt);
+        } catch (error) {
+          console.error("Error generating image:", error);
+        }
+      }
+
+      setMessages((prev) => [...prev, { role: "assistant", content: response, imagePrompt, imageUrl }]);
     } catch (error) {
       console.error("Error:", error);
       let errorMessage = "Sorry, there was an error processing your request.";
@@ -169,6 +179,9 @@ export default function Home() {
                         <div className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-600">
                           <p className="text-sm font-semibold">Image Prompt:</p>
                           <p className="text-sm italic">{message.imagePrompt}</p>
+                          {message.imageUrl && (
+                            <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="mt-2 max-w-full h-auto rounded-lg" />
+                          )}
                         </div>
                       )}
                     </div>
