@@ -175,13 +175,9 @@ export default function Home() {
                           {line}
                         </p>
                       ))}
-                      {message.imagePrompt && (
+                      {message.imageUrl && (
                         <div className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-600">
-                          <p className="text-sm font-semibold">Image Prompt:</p>
-                          <p className="text-sm italic">{message.imagePrompt}</p>
-                          {message.imageUrl && (
-                            <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="mt-2 max-w-full h-auto rounded-lg" />
-                          )}
+                          <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="mt-2 max-w-full h-auto rounded-lg" />
                         </div>
                       )}
                     </div>
