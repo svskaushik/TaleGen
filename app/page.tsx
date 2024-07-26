@@ -8,7 +8,7 @@ const langflowClient = new LangflowClient("http://127.0.0.1:7866");
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: string; content: string; imagePrompt?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -51,7 +51,20 @@ export default function Home() {
         "ddc17753-39a3-4517-acd1-cc2718cd0a83",
         currentInput
       );
-      setMessages((prev) => [...prev, { role: "assistant", content: response }]);
+      
+      let imagePrompt = "";
+      if (illustrationsEnabled) {
+        try {
+          imagePrompt = await langflowClient.generateImagePrompt(
+            "your-image-prompt-flow-id-here",
+            response
+          );
+        } catch (error) {
+          console.error("Error generating image prompt:", error);
+        }
+      }
+
+      setMessages((prev) => [...prev, { role: "assistant", content: response, imagePrompt }]);
     } catch (error) {
       console.error("Error:", error);
       let errorMessage = "Sorry, there was an error processing your request.";
@@ -149,6 +162,12 @@ export default function Home() {
                           {line}
                         </p>
                       ))}
+                      {message.imagePrompt && (
+                        <div className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-600">
+                          <p className="text-sm font-semibold">Image Prompt:</p>
+                          <p className="text-sm italic">{message.imagePrompt}</p>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}

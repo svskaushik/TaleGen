@@ -69,4 +69,22 @@ export class LangflowClient {
     }
     throw new Error('Unexpected response format from Langflow server');
   }
+
+  async generateImagePrompt(flowId: string, inputValue: string) {
+    const endpoint = `/api/v1/run/${flowId}?stream=false`;
+    const body = {
+      input_value: inputValue,
+      output_type: "text",
+      input_type: "text",
+      tweaks: {}
+    };
+    const response = await this.post(endpoint, body);
+    console.log('Image Prompt Response:', response);
+    if (response && response.outputs && response.outputs.length > 0 &&
+        response.outputs[0].outputs && response.outputs[0].outputs.length > 0 &&
+        response.outputs[0].outputs[0].artifacts && response.outputs[0].outputs[0].artifacts.text) {
+      return response.outputs[0].outputs[0].artifacts.text.repr.trim();
+    }
+    throw new Error('Unexpected response format from Langflow server for image prompt generation');
+  }
 }
