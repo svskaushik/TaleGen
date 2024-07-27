@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 import { generateImage } from "./utils/imageGenerationClient";
+import { speak, stopSpeaking } from "./utils/textToSpeech";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 const loadingMessages = ["Thinking", "Ideating", "Writing"];
 
-const langflowClient = new LangflowClient("http://127.0.0.1:7866");
+const langflowClient = new LangflowClient("http://127.0.0.1:7860");
 
 const testPrompt = '## The Shadow of the Mountains\nThe stench of Orc-flesh and damp earth filled Frodo’s nostrils. He lay huddled in the darkness, his body aching from the rough journey and the fear that gnawed at his insides. Sam, his loyal companion, was beside him, his breathing shallow and uneven. They had been captured, their escape from the Black Riders thwarted by the sudden appearance of a band of Orcs.“Frodo?” Sam whispered, his voice barely audible. “Are you alright?'
 
@@ -20,6 +21,7 @@ export default function Home() {
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [illustrationsEnabled, setIllustrationsEnabled] = useState(false);
+  const [narrationEnabled, setNarrationEnabled] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -129,21 +131,38 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Menu</h2>
           </div>
           <div className="mt-6">
-            <label className="flex items-center cursor-pointer">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={illustrationsEnabled}
-                  onChange={() => setIllustrationsEnabled(!illustrationsEnabled)}
-                />
-                <div className={`block w-14 h-8 rounded-full ${illustrationsEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}></div>
-                <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${illustrationsEnabled ? 'transform translate-x-6' : ''}`}></div>
-              </div>
-              <div className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
-                Illustrations
-              </div>
-            </label>
+            <div className="space-y-4">
+              <label className="flex items-center cursor-pointer">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={illustrationsEnabled}
+                    onChange={() => setIllustrationsEnabled(!illustrationsEnabled)}
+                  />
+                  <div className={`block w-14 h-8 rounded-full ${illustrationsEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}></div>
+                  <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${illustrationsEnabled ? 'transform translate-x-6' : ''}`}></div>
+                </div>
+                <div className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
+                  Illustrations
+                </div>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={narrationEnabled}
+                    onChange={() => setNarrationEnabled(!narrationEnabled)}
+                  />
+                  <div className={`block w-14 h-8 rounded-full ${narrationEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}></div>
+                  <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${narrationEnabled ? 'transform translate-x-6' : ''}`}></div>
+                </div>
+                <div className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
+                  Narration
+                </div>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -193,6 +212,14 @@ export default function Home() {
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {message.content}
                         </ReactMarkdown>
+                        {message.role === "assistant" && narrationEnabled && (
+                          <button
+                            onClick={() => speak(message.content)}
+                            className="mt-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
+                          >
+                            Narrate
+                          </button>
+                        )}
                       </div>
                       {message.imageUrl && (
                         <div className={`flex-1 flex flex-col align-middle ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
