@@ -152,7 +152,7 @@ export default function Home() {
         </header>
 
         {/* Chat area */}
-        <div className="flex-1 overflow-hidden p-4">
+        <div className="flex-1 overflow-hidden p-8">
           <div className="h-full flex flex-col">
             <div className="flex-1 overflow-y-auto mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
               <AnimatePresence>
