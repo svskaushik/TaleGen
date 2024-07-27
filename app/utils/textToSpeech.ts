@@ -1,3 +1,6 @@
+export type { SpeechSynthesisUtterance };
+
+// Keep these functions for fallback or browser compatibility
 export function speak(text: string): void {
   if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);

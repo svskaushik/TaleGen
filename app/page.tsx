@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 import { generateImage } from "./utils/imageGenerationClient";
-import { speak, stopSpeaking } from "./utils/textToSpeech";
+import { speak, stopSpeaking } from "./utils/googleTTS";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
