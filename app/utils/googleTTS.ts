@@ -1,3 +1,5 @@
+let audio: HTMLAudioElement | null = null;
+
 export async function speak(text: string): Promise<void> {
   try {
     const response = await fetch('/api/tts', {
@@ -15,13 +17,28 @@ export async function speak(text: string): Promise<void> {
     const audioContent = await response.arrayBuffer();
     const audioBlob = new Blob([audioContent], { type: 'audio/mp3' });
     const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
-    audio.play();
+    audio = new Audio(audioUrl);
+    await audio.play();
   } catch (error) {
     console.error('Error in text-to-speech:', error);
   }
 }
 
+export function pauseSpeaking(): void {
+  audio?.pause();
+}
+
+export function resumeSpeaking(): void {
+  audio?.play();
+}
+
 export function stopSpeaking(): void {
-  // Implement stop functionality if needed
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+}
+
+export function isPlaying(): boolean {
+  return audio ? !audio.paused : false;
 }
