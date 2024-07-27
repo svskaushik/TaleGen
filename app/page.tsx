@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 import { generateImage } from "./utils/imageGenerationClient";
-import AudioPlayer from './components/AudioPlayer';
-import { motion, AnimatePresence } from "framer-motion";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import ChatArea from './components/ChatArea';
 
 const loadingMessages = ["Thinking", "Ideating", "Writing"];
 
@@ -18,17 +17,10 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: string; content: string; imagePrompt?: string; imageUrl?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [illustrationsEnabled, setIllustrationsEnabled] = useState(false);
   const [narrationEnabled, setNarrationEnabled] = useState(false);
-  const [narrationAudioUrl, setNarrationAudioUrl] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
     if (isLoading) {
@@ -44,23 +36,24 @@ export default function Home() {
     }
   }, [isLoading]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+
+  const closeSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+  }, []);
 
   useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        await langflowClient.ping();
-        setConnectionStatus("connected");
-      } catch (error) {
-        setConnectionStatus("disconnected");
-        console.error("Failed to connect to Langflow server:", error);
+    const handleClickOutside = (event: MouseEvent) => {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && !sidebar.contains(event.target as Node) && isSidebarOpen) {
+        closeSidebar();
       }
     };
 
-    checkConnection();
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarOpen, closeSidebar]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,179 +109,42 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
+    <main className="relative min-h-screen bg-gray-200 dark:bg-gray-800">
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        closeSidebar={closeSidebar}
+        illustrationsEnabled={illustrationsEnabled}
+        setIllustrationsEnabled={setIllustrationsEnabled}
+        narrationEnabled={narrationEnabled}
+        setNarrationEnabled={setNarrationEnabled}
+      />
+
+      <div className="flex flex-col min-h-screen">
+        <Header setIsSidebarOpen={setIsSidebarOpen} />
+
+        <div className="flex-1 overflow-hidden p-8 flex flex-col">
+          <ChatArea
+            messages={messages}
+            isLoading={isLoading}
+            loadingMessage={loadingMessage}
+            narrationEnabled={narrationEnabled}
+          />
+          <form onSubmit={handleSubmit} className="flex mt-4">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-grow border border-gray-300 dark:border-gray-600 rounded-l-lg p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+              placeholder="Type your message here..."
+            />
             <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none"
+              type="submit"
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-r-lg transition-colors duration-200"
+              disabled={isLoading}
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              Send
             </button>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Menu</h2>
-          </div>
-          <div className="mt-6">
-            <div className="space-y-4">
-              <label className="flex items-center cursor-pointer">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={illustrationsEnabled}
-                    onChange={() => setIllustrationsEnabled(!illustrationsEnabled)}
-                  />
-                  <div className={`block w-14 h-8 rounded-full ${illustrationsEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}></div>
-                  <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${illustrationsEnabled ? 'transform translate-x-6' : ''}`}></div>
-                </div>
-                <div className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
-                  Illustrations
-                </div>
-              </label>
-              <label className="flex items-center cursor-pointer">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={narrationEnabled}
-                    onChange={() => setNarrationEnabled(!narrationEnabled)}
-                  />
-                  <div className={`block w-14 h-8 rounded-full ${narrationEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}></div>
-                  <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${narrationEnabled ? 'transform translate-x-6' : ''}`}></div>
-                </div>
-                <div className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
-                  Narration
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-md p-4 flex items-center">
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 ml-4">Chat with Langflow</h1>
-          <div className={`ml-auto text-sm ${
-            connectionStatus === "connected" ? "text-green-500" :
-            connectionStatus === "disconnected" ? "text-red-500" :
-            "text-yellow-500"
-          }`}>
-            Status: {connectionStatus}
-          </div>
-        </header>
-
-        {/* Chat area */}
-        <div className="flex-1 overflow-hidden p-8">
-          <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-              <AnimatePresence>
-                {messages.map((message, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
-                  >
-                    <div className={`inline-block p-2 rounded-lg ${
-                      message.role === "user" 
-                        ? "bg-blue-500 text-white" 
-                        : "bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
-                    } ${message.imageUrl ? 'flex flex-row w-full max-w-full' : ''}`}>
-                      <div className={`${message.imageUrl ? 'flex-1 pr-4' : ''} prose dark:prose-invert max-w-none`}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {message.content}
-                        </ReactMarkdown>
-                        {message.role === "assistant" && narrationEnabled && (
-                          <div className="mt-2">
-                            <button
-                              onClick={async () => {
-                                try {
-                                  const response = await fetch('/api/tts', {
-                                    method: 'POST',
-                                    headers: {
-                                      'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ text: message.content }),
-                                  });
-                                  
-                                  if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                  }
-                                  
-                                  const blob = await response.blob();
-                                  const url = URL.createObjectURL(blob);
-                                  setNarrationAudioUrl(url);
-                                } catch (error) {
-                                  console.error('Error generating narration:', error);
-                                }
-                              }}
-                              className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 flex items-center"
-                            >
-                              Generate Narration
-                            </button>
-                            {narrationAudioUrl && (
-                              <div className="mt-2">
-                                <AudioPlayer audioUrl={narrationAudioUrl} />
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      {message.imageUrl && (
-                        <div className={`flex-1 flex flex-col align-middle ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
-                          <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="w-full h-auto rounded-lg" />
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              {isLoading && (
-                <motion.div
-                  key={loadingMessage}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-center text-gray-500 dark:text-gray-400"
-                >
-                  {loadingMessage}...
-                </motion.div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-            <form onSubmit={handleSubmit} className="flex">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="flex-grow border border-gray-300 dark:border-gray-700 rounded-l-lg p-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                placeholder="Type your message here..."
-              />
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg transition-colors duration-200"
-                disabled={isLoading}
-              >
-                Send
-              </button>
-            </form>
-          </div>
+          </form>
         </div>
       </div>
     </main>

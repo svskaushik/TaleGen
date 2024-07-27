@@ -17,8 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const [response] = await client.synthesizeSpeech(request);
       const audioContent = response.audioContent;
 
-      res.setHeader('Content-Type', 'audio/mp3');
-      res.send(audioContent);
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Disposition', 'attachment; filename=narration.mp3');
+      res.send(Buffer.from(audioContent));
     } catch (error) {
       console.error('Error in text-to-speech API:', error);
       res.status(500).json({ error: 'Failed to synthesize speech' });
