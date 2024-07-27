@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 import { generateImage } from "./utils/imageGenerationClient";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+const loadingMessages = ["Thinking", "Ideating", "Writing"];
 
 const langflowClient = new LangflowClient("http://127.0.0.1:7866");
 
@@ -16,11 +20,26 @@ export default function Home() {
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "unknown">("unknown");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [illustrationsEnabled, setIllustrationsEnabled] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    if (isLoading) {
+      const intervalId = setInterval(() => {
+        setLoadingMessage((prevMessage) => {
+          const currentIndex = loadingMessages.indexOf(prevMessage);
+          const nextIndex = (currentIndex + 1) % loadingMessages.length;
+          return loadingMessages[nextIndex];
+        });
+      }, 3000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     scrollToBottom();
@@ -169,16 +188,14 @@ export default function Home() {
                       message.role === "user" 
                         ? "bg-blue-500 text-white" 
                         : "bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
-                    } ${message.imageUrl ? 'flex flex-row w-full max-w-4xl' : ''}`}>
-                      <div className={`${message.imageUrl ? 'flex-1 pr-4' : ''}`}>
-                        {message.content.split('\n').map((line, i) => (
-                          <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                            {line}
-                          </p>
-                        ))}
+                    } ${message.imageUrl ? 'flex flex-row w-full max-w-full' : ''}`}>
+                      <div className={`${message.imageUrl ? 'flex-1 pr-4' : ''} prose dark:prose-invert max-w-none`}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {message.content}
+                        </ReactMarkdown>
                       </div>
                       {message.imageUrl && (
-                        <div className={`flex-1 ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
+                        <div className={`flex-1 flex flex-col align-middle ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
                           <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="w-full h-auto rounded-lg" />
                         </div>
                       )}
@@ -188,11 +205,14 @@ export default function Home() {
               </AnimatePresence>
               {isLoading && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  key={loadingMessage}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
                   className="text-center text-gray-500 dark:text-gray-400"
                 >
-                  Thinking...
+                  {loadingMessage}...
                 </motion.div>
               )}
               <div ref={messagesEndRef} />
