@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LangflowClient } from "./utils/langflowClient";
 import { generateImage } from "./utils/imageGenerationClient";
-import { speak, pauseSpeaking, resumeSpeaking, isPlaying } from "./utils/googleTTS";
+import { speak, pauseSpeaking, resumeSpeaking, stopSpeaking, isPlaying } from "./utils/googleTTS";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -23,6 +23,7 @@ export default function Home() {
   const [illustrationsEnabled, setIllustrationsEnabled] = useState(false);
   const [narrationEnabled, setNarrationEnabled] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
+  const [currentNarrationIndex, setCurrentNarrationIndex] = useState<number | null>(null);
   const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -214,38 +215,58 @@ export default function Home() {
                           {message.content}
                         </ReactMarkdown>
                         {message.role === "assistant" && narrationEnabled && (
-                          <button
-                            onClick={() => {
-                              if (isNarrating) {
-                                if (isPlaying()) {
-                                  pauseSpeaking();
+                          <div className="mt-2 flex items-center">
+                            <button
+                              onClick={() => {
+                                if (isNarrating && currentNarrationIndex === index) {
+                                  if (isPlaying()) {
+                                    pauseSpeaking();
+                                  } else {
+                                    resumeSpeaking();
+                                  }
                                 } else {
-                                  resumeSpeaking();
+                                  stopSpeaking();
+                                  setIsNarrating(true);
+                                  setCurrentNarrationIndex(index);
+                                  speak(message.content).then(() => {
+                                    setIsNarrating(false);
+                                    setCurrentNarrationIndex(null);
+                                  });
                                 }
-                              } else {
-                                setIsNarrating(true);
-                                speak(message.content).then(() => setIsNarrating(false));
-                              }
-                            }}
-                            className="mt-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 flex items-center"
-                          >
-                            {isNarrating ? (
-                              isPlaying() ? (
-                                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
+                              }}
+                              className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 flex items-center"
+                            >
+                              {isNarrating && currentNarrationIndex === index ? (
+                                isPlaying() ? (
+                                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                ) : (
+                                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                  </svg>
+                                )
                               ) : (
                                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
                                 </svg>
-                              )
-                            ) : (
+                              )}
+                              {isNarrating && currentNarrationIndex === index ? (isPlaying() ? "Pause" : "Resume") : "Narrate"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                stopSpeaking();
+                                setIsNarrating(false);
+                                setCurrentNarrationIndex(null);
+                              }}
+                              className="ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200 flex items-center"
+                            >
                               <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 5a1 1 0 00-1 1v8a1 1 0 001 1h4a1 1 0 001-1V6a1 1 0 00-1-1H8z" clipRule="evenodd" />
                               </svg>
-                            )}
-                            {isNarrating ? (isPlaying() ? "Pause" : "Resume") : "Narrate"}
-                          </button>
+                              Stop
+                            </button>
+                          </div>
                         )}
                       </div>
                       {message.imageUrl && (
