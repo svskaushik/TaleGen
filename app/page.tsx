@@ -169,15 +169,17 @@ export default function Home() {
                       message.role === "user" 
                         ? "bg-blue-500 text-white" 
                         : "bg-gray-200 text-black dark:bg-gray-700 dark:text-white"
-                    }`}>
-                      {message.content.split('\n').map((line, i) => (
-                        <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                          {line}
-                        </p>
-                      ))}
+                    } ${message.imageUrl ? 'flex flex-row w-full max-w-4xl' : ''}`}>
+                      <div className={`${message.imageUrl ? 'flex-1 pr-4' : ''}`}>
+                        {message.content.split('\n').map((line, i) => (
+                          <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                            {line}
+                          </p>
+                        ))}
+                      </div>
                       {message.imageUrl && (
-                        <div className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-600">
-                          <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="mt-2 max-w-full h-auto rounded-lg" />
+                        <div className={`flex-1 ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
+                          <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="w-full h-auto rounded-lg" />
                         </div>
                       )}
                     </div>
