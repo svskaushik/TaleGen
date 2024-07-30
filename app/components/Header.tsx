@@ -6,7 +6,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ setIsSidebarOpen }) => {
   return (
-    <header className="bg-gray-100 dark:bg-gray-700 shadow-md p-4 flex justify-between items-center">
+    <header className="bg-gray-100 dark:bg-gray-700 shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
       <button
         onClick={() => setIsSidebarOpen(true)}
         className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none"

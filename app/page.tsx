@@ -122,7 +122,7 @@ export default function Home() {
       <div className="flex flex-col min-h-screen">
         <Header setIsSidebarOpen={setIsSidebarOpen} />
 
-        <div className="flex-1 overflow-hidden p-8 flex flex-col">
+        <div className="flex-1 overflow-y-auto p-8 flex flex-col mt-16">
           <ChatArea
             messages={messages}
             isLoading={isLoading}
