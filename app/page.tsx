@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { LangflowClient } from "./utils/langflowClient";
 import { generateImage } from "./utils/imageGenerationClient";
 import Sidebar from './components/Sidebar';
@@ -99,6 +100,19 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-gray-200 dark:bg-gray-800">
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={closeSidebar}
+          />
+        )}
+      </AnimatePresence>
+      
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         closeSidebar={closeSidebar}
@@ -108,7 +122,7 @@ export default function Home() {
         setNarrationEnabled={setNarrationEnabled}
       />
 
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen relative">
         <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         <div className="flex-1 overflow-y-auto p-8 flex flex-col mt-16">
