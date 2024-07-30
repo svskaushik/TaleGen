@@ -1,7 +1,7 @@
 export class LangflowClient {
   private baseURL: string;
   private apiKey?: string;
-  private imageGenURL: string = 'https://stablediffjm93xzi2jo-2a7ea2eb749f41aa.tec-s1.onthetaedgecloud.com/sdapi/v1/txt2img';
+  private imageGenURL: string = `${process.env.NEXT_PUBLIC_IMAGE_GENERATION_URL}`;
 
   constructor(baseURL: string, apiKey?: string) {
     this.baseURL = baseURL;

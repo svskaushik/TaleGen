@@ -1,5 +1,5 @@
 export async function generateImage(prompt: string): Promise<string> {
-  const response = await fetch('https://stablediffjm93xzi2jo-2a7ea2eb749f41aa.tec-s1.onthetaedgecloud.com/sdapi/v1/txt2img', {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_GENERATION_URL}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
