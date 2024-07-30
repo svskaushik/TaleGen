@@ -41,8 +41,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, loadingMessage
               message.role === "user" 
                 ? "bg-gray-300 text-gray-800" 
                 : "bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
-            } ${message.imageUrl ? 'flex flex-row w-full max-w-full' : ''}`}>
-              <div className={`${message.imageUrl ? 'flex-1 pr-4' : ''} prose dark:prose-invert max-w-none`}>
+            } ${message.imageUrl ? 'flex flex-row w-full max-w-full h-[500px]' : ''}`}>
+              <div className={`${message.imageUrl ? 'flex-1 pr-4 overflow-y-auto custom-scrollbar' : ''} prose dark:prose-invert max-w-none`}>
                 {message.role === "assistant" && narrationEnabled && (
                   <NarrationPlayer content={message.content} />
                 )}
@@ -56,8 +56,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, loadingMessage
                 </ReactMarkdown>
               </div>
               {message.imageUrl && (
-                <div className={`flex-1 flex flex-col align-middle ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
-                  <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="w-full h-auto rounded-lg" />
+                <div className="flex-1 flex items-center justify-center">
+                  <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="max-w-full max-h-full object-contain rounded-lg" />
                 </div>
               )}
             </div>
