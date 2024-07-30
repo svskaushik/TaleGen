@@ -11,6 +11,14 @@ const nextConfig = {
     }
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/langflow-proxy/:path*',
+        destination: 'http://68.150.201.0:7860/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

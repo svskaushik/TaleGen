@@ -3,8 +3,8 @@ export class LangflowClient {
   private apiKey?: string;
   private imageGenURL: string = `${process.env.NEXT_PUBLIC_IMAGE_GENERATION_URL}`;
 
-  constructor(baseURL: string, apiKey?: string) {
-    this.baseURL = baseURL;
+  constructor(apiKey?: string) {
+    this.baseURL = '/api/langflow-proxy';
     this.apiKey = apiKey;
   }
 
