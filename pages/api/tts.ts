@@ -14,8 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         audioConfig: { audioEncoding: 'MP3' },
       };
 
-      const [response] = await client.synthesizeSpeech(request);
-      const audioContent = response.audioContent;
+      const [response] = await client.synthesizeSpeech(request) as [textToSpeech.protos.google.cloud.texttospeech.v1.ISynthesizeSpeechResponse];
+      const audioContent = response.audioContent as Buffer;
 
       res.setHeader('Content-Type', 'audio/mpeg');
       res.setHeader('Content-Disposition', 'attachment; filename=narration.mp3');
