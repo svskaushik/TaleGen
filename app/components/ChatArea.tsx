@@ -56,8 +56,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, loadingMessage
                 </ReactMarkdown>
               </div>
               {message.imageUrl && (
-                <div className="flex-1 flex items-center justify-center">
-                  <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="max-w-full max-h-full object-contain rounded-lg" />
+                <div className="flex-1 flex items-center justify-center p-1">
+                  <img src={`data:image/png;base64,${message.imageUrl}`} alt="Generated image" className="w-full h-full object-contain rounded-lg" />
                 </div>
               )}
             </div>
