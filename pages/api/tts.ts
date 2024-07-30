@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import textToSpeech from '@google-cloud/text-to-speech';
+import { protos } from '@google-cloud/text-to-speech';
 
 const client = new textToSpeech.TextToSpeechClient();
 
@@ -8,10 +9,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { text } = req.body;
 
-      const request: textToSpeech.protos.google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
+      const request: protos.google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
         input: { text },
         voice: { languageCode: 'en-US', name: 'en-US-Neural2-D' },
-        audioConfig: { audioEncoding: textToSpeech.protos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
+        audioConfig: { audioEncoding: protos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
       };
 
       const [response] = await client.synthesizeSpeech(request);
