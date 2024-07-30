@@ -36,24 +36,13 @@ export default function Home() {
     }
   }, [isLoading]);
 
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen(prevState => !prevState);
+  }, []);
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar && !sidebar.contains(event.target as Node) && isSidebarOpen) {
-        closeSidebar();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isSidebarOpen, closeSidebar]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +109,7 @@ export default function Home() {
       />
 
       <div className="flex flex-col min-h-screen">
-        <Header setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
+        <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         <div className="flex-1 overflow-y-auto p-8 flex flex-col mt-16">
           <ChatArea
