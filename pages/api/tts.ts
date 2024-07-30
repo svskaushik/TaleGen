@@ -8,13 +8,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { text } = req.body;
 
-      const request = {
+      const request: textToSpeech.protos.google.cloud.texttospeech.v1.ISynthesizeSpeechRequest = {
         input: { text },
         voice: { languageCode: 'en-US', name: 'en-US-Neural2-D' },
-        audioConfig: { audioEncoding: 'MP3' },
+        audioConfig: { audioEncoding: textToSpeech.protos.google.cloud.texttospeech.v1.AudioEncoding.MP3 },
       };
 
-      const [response] = (await client.synthesizeSpeech(request)) as unknown as [textToSpeech.protos.google.cloud.texttospeech.v1.ISynthesizeSpeechResponse];
+      const [response] = await client.synthesizeSpeech(request);
       const audioContent = response.audioContent as Buffer;
 
       res.setHeader('Content-Type', 'audio/mpeg');
