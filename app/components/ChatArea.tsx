@@ -43,6 +43,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, loadingMessage
                 : "bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
             } ${message.imageUrl ? 'flex flex-row w-full max-w-full' : ''}`}>
               <div className={`${message.imageUrl ? 'flex-1 pr-4' : ''} prose dark:prose-invert max-w-none`}>
+                {message.role === "assistant" && narrationEnabled && (
+                  <NarrationPlayer content={message.content} />
+                )}
                 {message.role === "assistant" && (
                   <h2 className="text-center text-xl font-bold mb-2">
                     {message.content.split('\n')[0].replace('## ', '')}
@@ -51,9 +54,6 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, loadingMessage
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {message.role === "assistant" ? message.content.split('\n').slice(1).join('\n') : message.content}
                 </ReactMarkdown>
-                {message.role === "assistant" && narrationEnabled && (
-                  <NarrationPlayer content={message.content} />
-                )}
               </div>
               {message.imageUrl && (
                 <div className={`flex-1 flex flex-col align-middle ${message.role === "user" ? 'pl-4' : 'pr-4'}`}>
