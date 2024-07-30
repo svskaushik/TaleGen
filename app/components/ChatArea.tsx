@@ -41,7 +41,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, loadingMessage
               message.role === "user" 
                 ? "bg-gray-300 text-gray-800" 
                 : "bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
-            } ${message.imageUrl ? 'flex flex-row w-full max-w-full h-[800px]' : ''}`}>
+            } ${message.imageUrl ? 'flex flex-row w-full max-w-full h-[calc(100vh-200px)]' : ''}`}>
               <div className={`${message.imageUrl ? 'flex-1 pr-4 overflow-y-auto custom-scrollbar' : ''} prose dark:prose-invert max-w-none`}>
                 {message.role === "assistant" && narrationEnabled && (
                   <NarrationPlayer content={message.content} />
